@@ -81,6 +81,7 @@ INSTRUÇÕES PARA O FRONTEND - AUTENTICAÇÃO E TROCA DE SENHA
      "message": "Login successful",
      "user": {
        "idusuario": 1,
+       "codusuario": "admin",
        "codperfil": 1,
        "nome_usuario": "Administrador"
      }
@@ -499,6 +500,7 @@ export default function LoginPage() {
       // ✓ SALVAR CORRETAMENTE
       const userData = {
         idusuario: data.user.idusuario,
+        codusuario: data.user.codusuario,
         codperfil: data.user.codperfil,
         nome_usuario: data.user.nome_usuario
       };

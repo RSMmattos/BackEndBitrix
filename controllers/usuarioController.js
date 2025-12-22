@@ -67,6 +67,30 @@ class GusuarioController {
       res.status(500).json({ error: error.message });
     }
   }
+
+  static async changePassword(req, res) {
+    try {
+      const { idusuario } = req.params;
+      const { senhaAtual, senhaNova } = req.body;
+
+      if (!senhaAtual || !senhaNova) {
+        return res.status(400).json({ message: 'Senha atual e nova senha são obrigatórias' });
+      }
+
+      if (senhaNova.length < 6) {
+        return res.status(400).json({ message: 'Nova senha deve ter pelo menos 6 caracteres' });
+      }
+
+      const result = await Gusuario.changePassword(idusuario, senhaAtual, senhaNova);
+      if (result.success) {
+        res.json({ message: 'Senha alterada com sucesso' });
+      } else {
+        res.status(401).json({ message: result.message });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
 }
 
 module.exports = GusuarioController;
