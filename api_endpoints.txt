@@ -1,0 +1,41 @@
+Lista de Endpoints da API BackBitrix
+
+Base URL: http://localhost:3000
+
+1. Health Check
+   - GET / : Verifica se a API está rodando
+
+2. Gccusto (Centros de Custo)
+   - GET /api/gccusto : Lista todos os centros de custo
+   - GET /api/gccusto/:codccusto : Busca centro de custo por código
+   - POST /api/gccusto : Cria novo centro de custo
+   - PUT /api/gccusto/:codccusto : Atualiza centro de custo
+   - DELETE /api/gccusto/:codccusto : Deleta centro de custo
+
+3. Bgcatividade (Grupos de Atividade)
+   - GET /api/bgcatividade : Lista todos os grupos de atividade
+   - GET /api/bgcatividade/:codccusto : Busca grupo de atividade por código
+   - POST /api/bgcatividade : Cria novo grupo de atividade
+   - PUT /api/bgcatividade/:codccusto : Atualiza grupo de atividade
+   - DELETE /api/bgcatividade/:codccusto : Deleta grupo de atividade
+
+4. Batividadeg (Atividades)
+   - GET /api/batividadeg : Lista todas as atividades
+   - GET /api/batividadeg/:id : Busca atividade por ID
+   - POST /api/batividadeg : Cria nova atividade
+   - PUT /api/batividadeg/:id : Atualiza atividade
+   - DELETE /api/batividadeg/:id : Deleta atividade
+
+5. Usuario (Usuários)
+   - GET /api/usuario : Lista todos os usuários (sem senhas)
+   - GET /api/usuario/:idusuario : Busca usuário por ID
+   - POST /api/usuario : Cria novo usuário
+   - PUT /api/usuario/:idusuario : Atualiza usuário
+   - DELETE /api/usuario/:idusuario : Deleta usuário
+   - POST /api/usuario/login : Faz login do usuário
+
+Observações:
+- Todos os endpoints POST e PUT esperam dados em JSON no body da requisição
+- As senhas dos usuários são hashadas com bcrypt
+- O login retorna dados do usuário sem a senha
+- Erros são retornados com códigos HTTP apropriados e mensagens em JSON

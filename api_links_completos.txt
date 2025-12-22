@@ -1,0 +1,49 @@
+Links Completos da API BackBitrix
+
+Base URL: http://localhost:3000
+
+Endpoints:
+
+1. Health Check
+   - GET http://localhost:3000/
+
+2. Gccusto (Centros de Custo)
+   - GET http://localhost:3000/api/gccusto
+   - GET http://localhost:3000/api/gccusto/:codccusto
+   - POST http://localhost:3000/api/gccusto
+   - PUT http://localhost:3000/api/gccusto/:codccusto
+   - DELETE http://localhost:3000/api/gccusto/:codccusto
+
+3. Bgcatividade (Grupos de Atividade)
+   - GET http://localhost:3000/api/bgcatividade
+   - GET http://localhost:3000/api/bgcatividade/:codccusto
+   - POST http://localhost:3000/api/bgcatividade
+   - PUT http://localhost:3000/api/bgcatividade/:codccusto
+   - DELETE http://localhost:3000/api/bgcatividade/:codccusto
+
+4. Batividadeg (Atividades)
+   - GET http://localhost:3000/api/batividadeg
+   - GET http://localhost:3000/api/batividadeg/:idtask
+   - POST http://localhost:3000/api/batividadeg
+   - PUT http://localhost:3000/api/batividadeg/:idtask
+   - DELETE http://localhost:3000/api/batividadeg/:idtask
+
+5. Usuario (Usuários)
+   - GET http://localhost:3000/api/usuario
+   - GET http://localhost:3000/api/usuario/:idusuario
+   - POST http://localhost:3000/api/usuario
+   - PUT http://localhost:3000/api/usuario/:idusuario
+   - DELETE http://localhost:3000/api/usuario/:idusuario
+   - POST http://localhost:3000/api/usuario/login
+
+Exemplo de uso com curl:
+
+Login:
+curl -X POST http://localhost:3000/api/usuario/login \
+  -H "Content-Type: application/json" \
+  -d '{"codusuario":"admin","senha":"password"}'
+
+Criar centro de custo:
+curl -X POST http://localhost:3000/api/gccusto \
+  -H "Content-Type: application/json" \
+  -d '{"codccusto":"001","nome":"Centro 1","ativo":true}'
