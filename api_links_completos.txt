@@ -35,6 +35,7 @@ Endpoints:
    - PUT http://localhost:3000/api/usuario/:idusuario
    - DELETE http://localhost:3000/api/usuario/:idusuario
    - POST http://localhost:3000/api/usuario/login
+   - POST http://localhost:3000/api/usuario/alterar-senha/:idusuario
 
 Exemplo de uso com curl:
 
@@ -43,7 +44,500 @@ curl -X POST http://localhost:3000/api/usuario/login \
   -H "Content-Type: application/json" \
   -d '{"codusuario":"admin","senha":"password"}'
 
+Alterar Senha (Trocar Senha do Usuário Logado):
+curl -X POST http://localhost:3000/api/usuario/alterar-senha/1 \
+  -H "Content-Type: application/json" \
+  -d '{"senhaAtual":"password","senhaNova":"novaPassword123"}'
+
 Criar centro de custo:
 curl -X POST http://localhost:3000/api/gccusto \
   -H "Content-Type: application/json" \
   -d '{"codccusto":"001","nome":"Centro 1","ativo":true}'
+
+═══════════════════════════════════════════════════════════════════════════════
+
+INSTRUÇÕES PARA O FRONTEND - AUTENTICAÇÃO E TROCA DE SENHA
+
+═══════════════════════════════════════════════════════════════════════════════
+
+1. TELA DE LOGIN (Fazer Login)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   Endpoint: POST http://localhost:3000/api/usuario/login
+   
+   Headers:
+   {
+     "Content-Type": "application/json"
+   }
+   
+   Body (JSON):
+   {
+     "codusuario": "admin",
+     "senha": "password"
+   }
+   
+   Resposta Sucesso (200):
+   {
+     "message": "Login successful",
+     "user": {
+       "idusuario": 1,
+       "codperfil": 1,
+       "nome_usuario": "Administrador"
+     }
+   }
+   
+   Resposta Erro (401):
+   {
+     "message": "Invalid credentials"
+   }
+
+   **IMPORTANTE**: Armazene o `idusuario` no localStorage ou sessão para usar no endpoint de trocar senha:
+   
+   localStorage.setItem('idusuario', response.user.idusuario);
+
+═══════════════════════════════════════════════════════════════════════════════
+
+2. TELA DE TROCAR SENHA (Alterar Senha do Usuário Logado)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+   Endpoint: POST http://localhost:3000/api/usuario/alterar-senha/:idusuario
+   
+   Onde :idusuario = ID do usuário logado (obtido no login)
+   
+   Headers:
+   {
+     "Content-Type": "application/json"
+   }
+   
+   Body (JSON):
+   {
+     "senhaAtual": "password",
+     "senhaNova": "novaPassword123"
+   }
+   
+   Validações no Backend:
+   - Senha atual e nova senha são obrigatórias
+   - Nova senha deve ter mínimo 6 caracteres
+   - Senha atual deve estar correta (comparação criptografada)
+   
+   Resposta Sucesso (200):
+   {
+     "message": "Senha alterada com sucesso"
+   }
+   
+   Resposta Erro (400 - Validação):
+   {
+     "message": "Nova senha deve ter pelo menos 6 caracteres"
+   }
+   
+   Resposta Erro (401 - Senha Incorreta):
+   {
+     "message": "Senha atual está incorreta"
+   }
+   
+   Resposta Erro (404 - Usuário não encontrado):
+   {
+     "message": "Usuário não encontrado"
+   }
+
+═══════════════════════════════════════════════════════════════════════════════
+
+3. EXEMPLO DE IMPLEMENTAÇÃO EM JAVASCRIPT/REACT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+// Função para fazer Login
+async function fazerLogin(codusuario, senha) {
+  try {
+    const response = await fetch('http://localhost:3000/api/usuario/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        codusuario: codusuario,
+        senha: senha
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('Credenciais inválidas');
+    }
+
+    const data = await response.json();
+    
+    // Armazenar usuário no localStorage
+    localStorage.setItem('usuario', JSON.stringify(data.user));
+    localStorage.setItem('idusuario', data.user.idusuario);
+    
+    return { sucesso: true, usuario: data.user };
+  } catch (error) {
+    return { sucesso: false, erro: error.message };
+  }
+}
+
+// Função para Trocar Senha
+async function trocarSenha(senhaAtual, senhaNova) {
+  try {
+    const idusuario = localStorage.getItem('idusuario');
+    
+    if (!idusuario) {
+      throw new Error('Usuário não logado. Faça login primeiro.');
+    }
+
+    const response = await fetch(
+      `http://localhost:3000/api/usuario/alterar-senha/${idusuario}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          senhaAtual: senhaAtual,
+          senhaNova: senhaNova
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message);
+    }
+
+    return { sucesso: true, mensagem: data.message };
+  } catch (error) {
+    return { sucesso: false, erro: error.message };
+  }
+}
+
+// Uso em uma Tela/Componente:
+// ───────────────────────────────────────────────────────────────────────────
+
+async function handleTrocarSenha(formData) {
+  const { senhaAtual, senhaNova, confirmarSenha } = formData;
+
+  // Validação no Frontend
+  if (!senhaAtual || !senhaNova || !confirmarSenha) {
+    alert('Todos os campos são obrigatórios');
+    return;
+  }
+
+  if (senhaNova !== confirmarSenha) {
+    alert('A nova senha e confirmação não correspondem');
+    return;
+  }
+
+  if (senhaNova.length < 6) {
+    alert('Nova senha deve ter pelo menos 6 caracteres');
+    return;
+  }
+
+  // Chamada ao Backend
+  const resultado = await trocarSenha(senhaAtual, senhaNova);
+
+  if (resultado.sucesso) {
+    alert('Senha alterada com sucesso!');
+    // Redirecionar para login ou dashboard
+  } else {
+    alert('Erro: ' + resultado.erro);
+  }
+}
+
+═══════════════════════════════════════════════════════════════════════════════
+
+4. FLUXO DE SEGURANÇA - COMO FUNCIONA A CRIPTOGRAFIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Senha NO Frontend:
+  - O usuário digita a senha em um campo de input (type="password")
+  - A senha é enviada em TEXTO PLANO pelo HTTPS (criptografia da rede)
+  
+✓ Senha NO Backend:
+  - Recebe a senha em texto plano do cliente
+  - **CRIPTOGRAFA** com bcrypt (um-way encryption)
+  - Armazena apenas o HASH no banco de dados
+  - Nunca armazena a senha original
+
+✓ Verificação no Login:
+  - Recebe a senha digitada em texto plano
+  - Compara com o HASH armazenado usando bcrypt.compare()
+  - bcrypt compara de forma segura sem revelar a senha
+
+✓ Trocar Senha:
+  - Recebe senha atual em texto plano
+  - Verifica se está correta comparando com o HASH existente
+  - Se correto, criptografa a nova senha
+  - Atualiza o HASH no banco de dados
+
+═══════════════════════════════════════════════════════════════════════════════
+
+5. CHECKLIST DE IMPLEMENTAÇÃO NO FRONTEND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+□ Tela de Login:
+  - [ ] Campo: Código do Usuário (codusuario)
+  - [ ] Campo: Senha (type="password")
+  - [ ] Botão: Fazer Login
+  - [ ] Armazenar resposta no localStorage
+  - [ ] Redirecionar para Dashboard após sucesso
+
+□ Tela de Trocar Senha:
+  - [ ] Campo: Senha Atual (type="password")
+  - [ ] Campo: Nova Senha (type="password")
+  - [ ] Campo: Confirmar Nova Senha (type="password")
+  - [ ] Validar se senha atual e nova são diferentes
+  - [ ] Validar comprimento mínimo (6 caracteres)
+  - [ ] Validar se nova senha == confirmação
+  - [ ] Botão: Atualizar Senha
+  - [ ] Mostrar mensagem de sucesso/erro
+  - [ ] Redirecionar para login após trocar senha com sucesso
+
+□ Segurança:
+  - [ ] Usar HTTPS em produção
+  - [ ] Não exibir senhas em logs ou console
+  - [ ] Limpar campos de senha após envio
+  - [ ] Implementar timeout de sessão
+  - [ ] Validar token/sessão a cada requisição (se implementado)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+6. SOLUÇÃO PARA EXIBIR USUÁRIO NO SIDEBAR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PASSO 1: VERIFICAR SE O LOGIN ESTÁ RETORNANDO O USUÁRIO CORRETAMENTE
+
+Abra o Console do Navegador (F12) e faça login com suas credenciais:
+1. Acesse a tela de login
+2. Digite o código do usuário e senha
+3. Clique em "Fazer Login"
+4. Abra o console do navegador (F12 → Aba Console)
+5. Digite: localStorage.getItem('agroserra_user_data')
+
+✓ RESULTADO ESPERADO:
+  A resposta deve ser um JSON como este:
+  {"idusuario":1,"codperfil":1,"nome_usuario":"Administrador"}
+
+✗ SE NÃO APARECER NADA:
+  Significa que o localStorage não foi preenchido corretamente.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASSO 2: CÓDIGO CORRETO PARA FAZER LOGIN (REACT/JAVASCRIPT)
+
+Ensure que você está salvando CORRETAMENTE no localStorage:
+
+// FORMA CORRETA - Salvar dados do usuário após login
+async function handleLogin(codusuario, senha) {
+  try {
+    const response = await fetch('http://localhost:3000/api/usuario/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        codusuario: codusuario,
+        senha: senha
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Erro ao fazer login');
+    }
+
+    const data = await response.json();
+    
+    // ✓ IMPORTANTE: Salvar os dados do usuário
+    console.log('Dados do usuário retornados:', data.user);
+    
+    // Salvar no localStorage
+    localStorage.setItem('agroserra_user_data', JSON.stringify(data.user));
+    localStorage.setItem('idusuario', data.user.idusuario);
+    localStorage.setItem('userName', data.user.nome_usuario);
+    localStorage.setItem('userProfile', data.user.codperfil);
+    
+    // Redirecionar ou atualizar estado
+    window.location.href = '/dashboard';
+    
+    return { sucesso: true, usuario: data.user };
+  } catch (error) {
+    console.error('Erro no login:', error.message);
+    return { sucesso: false, erro: error.message };
+  }
+}
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASSO 3: CÓDIGO PARA EXIBIR O NOME NO SIDEBAR (REACT)
+
+Utilize este código no seu componente de Sidebar:
+
+import React, { useState, useEffect } from 'react';
+
+export default function Sidebar() {
+  const [userName, setUserName] = useState('Visitante');
+
+  useEffect(() => {
+    // Recuperar dados do usuário ao montar o componente
+    const userDataStr = localStorage.getItem('agroserra_user_data');
+    
+    if (userDataStr) {
+      try {
+        const userData = JSON.parse(userDataStr);
+        console.log('Usuário recuperado:', userData);
+        setUserName(userData.nome_usuario || 'Usuário');
+      } catch (error) {
+        console.error('Erro ao parsear dados do usuário:', error);
+      }
+    } else {
+      console.warn('Nenhum usuário salvo no localStorage');
+    }
+  }, []); // Array vazio = executar só na montagem
+
+  return (
+    <aside className="sidebar">
+      <div className="user-info">
+        <h3>Bem-vindo!</h3>
+        <p>Usuário: <strong>{userName}</strong></p>
+      </div>
+      
+      <nav>
+        {/* seu menu aqui */}
+      </nav>
+    </aside>
+  );
+}
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASSO 4: SE AINDA NÃO FUNCIONAR - CHECKLIST DE DEBUGGING
+
+☐ O servidor está rodando? (http://localhost:3000)
+  
+☐ O login foi bem-sucedido?
+  - Abra a Aba "Network" (F12 → Network)
+  - Clique em "Fazer Login"
+  - Procure a requisição "login"
+  - Clique nela
+  - Abra a aba "Response"
+  - Você deve ver: { "message": "Login successful", "user": { "idusuario": 1, ... } }
+
+☐ O localStorage está recebendo os dados?
+  - Abra Console (F12 → Console)
+  - Digite: Object.keys(localStorage)
+  - Procure por "agroserra_user_data"
+  - Se não aparecer, o problema está no handleLogin
+
+☐ A chave está correta?
+  - Seu código está usando 'agroserra_user_data'?
+  - Ou está usando outro nome? (verificar exatamente qual nome)
+
+☐ Cache do navegador?
+  - Limpe o cache: Ctrl+Shift+Delete
+  - Recarregue a página: Ctrl+F5
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASSO 5: TESTE RÁPIDO COM CURL (Para validar o backend)
+
+Abra o PowerShell e teste o login no backend:
+
+powershell -Command @"
+`$body = @{
+  codusuario = 'admin'
+  senha = 'password'
+} | ConvertTo-Json
+
+`$response = Invoke-RestMethod -Uri 'http://localhost:3000/api/usuario/login' `
+  -Method POST `
+  -ContentType 'application/json' `
+  -Body `$body
+
+Write-Host 'Resposta do servidor:' -ForegroundColor Green
+`$response | ConvertTo-Json
+"@
+
+✓ Se retornar JSON com "message": "Login successful" e um objeto "user" com os campos:
+  - idusuario
+  - codperfil
+  - nome_usuario
+  
+Então o BACKEND está 100% correto e o problema está no FRONTEND.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+PASSO 6: ESTRUTURA COMPLETA DO LOGIN (REACT HOOKS)
+
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+export default function LoginPage() {
+  const [codusuario, setCodusuario] = useState('');
+  const [senha, setSenha] = useState('');
+  const [erro, setErro] = useState('');
+  const [carregando, setCarregando] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setErro('');
+    setCarregando(true);
+
+    try {
+      const response = await fetch('http://localhost:3000/api/usuario/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ codusuario, senha })
+      });
+
+      if (!response.ok) {
+        throw new Error('Credenciais inválidas');
+      }
+
+      const data = await response.json();
+      
+      // ✓ SALVAR CORRETAMENTE
+      const userData = {
+        idusuario: data.user.idusuario,
+        codperfil: data.user.codperfil,
+        nome_usuario: data.user.nome_usuario
+      };
+      
+      localStorage.setItem('agroserra_user_data', JSON.stringify(userData));
+      
+      console.log('Login bem-sucedido:', userData);
+      navigate('/dashboard');
+      
+    } catch (error) {
+      setErro(error.message);
+      console.error('Erro:', error);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleLogin}>
+      <input
+        type="text"
+        placeholder="Código do Usuário"
+        value={codusuario}
+        onChange={(e) => setCodusuario(e.target.value)}
+        required
+      />
+      <input
+        type="password"
+        placeholder="Senha"
+        value={senha}
+        onChange={(e) => setSenha(e.target.value)}
+        required
+      />
+      <button type="submit" disabled={carregando}>
+        {carregando ? 'Entrando...' : 'Fazer Login'}
+      </button>
+      {erro && <p style={{ color: 'red' }}>{erro}</p>}
+    </form>
+  );
+}
+
+═══════════════════════════════════════════════════════════════════════════════
