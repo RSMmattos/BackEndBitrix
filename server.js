@@ -7,6 +7,7 @@ const gccustoRoutes = require('./routes/gccusto');
 const bgcatividadeRoutes = require('./routes/bgcatividade');
 const batividadegRoutes = require('./routes/batividadeg');
 const usuarioRoutes = require('./routes/usuario');
+const relatorioRoutes = require('./routes/relatorio');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,7 @@ app.use('/api/gccusto', gccustoRoutes);
 app.use('/api/bgcatividade', bgcatividadeRoutes);
 app.use('/api/batividadeg', batividadegRoutes);
 app.use('/api/usuario', usuarioRoutes);
+app.use('/api/relatorio', relatorioRoutes);
 
 // Health check
 app.get('/', (req, res) => {

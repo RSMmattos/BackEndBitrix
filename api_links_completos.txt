@@ -37,6 +37,11 @@ Endpoints:
    - POST http://localhost:3000/api/usuario/login
    - POST http://localhost:3000/api/usuario/alterar-senha/:idusuario
 
+6. Relatorio (Relatórios)
+   - GET http://localhost:3000/api/relatorio/resumo-atividades
+   - GET http://localhost:3000/api/relatorio/resumo-atividades-pivot
+   - GET http://localhost:3000/api/relatorio/resumo-atividades/:codccusto
+
 Exemplo de uso com curl:
 
 Login:
