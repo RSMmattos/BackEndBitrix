@@ -23,6 +23,8 @@ Endpoints:
 
 4. Batividadeg (Atividades)
    - GET http://localhost:3000/api/batividadeg
+   - GET http://localhost:3000/api/batividadeg/filtro/datas?dataInicio=YYYY-MM-DD&dataFim=YYYY-MM-DD
+   - GET http://localhost:3000/api/batividadeg/grupo/:idgrupobitrix
    - GET http://localhost:3000/api/batividadeg/:idtask
    - POST http://localhost:3000/api/batividadeg
    - PUT http://localhost:3000/api/batividadeg/:idtask
@@ -58,6 +60,12 @@ Criar centro de custo:
 curl -X POST http://localhost:3000/api/gccusto \
   -H "Content-Type: application/json" \
   -d '{"codccusto":"001","nome":"Centro 1","ativo":true}'
+
+Obter Atividades por Grupo (idgrupobitrix):
+curl -X GET http://localhost:3000/api/batividadeg/grupo/1
+
+Obter Atividades por Filtro de Data:
+curl -X GET "http://localhost:3000/api/batividadeg/filtro/datas?dataInicio=2025-01-01&dataFim=2025-12-31"
 
 ═══════════════════════════════════════════════════════════════════════════════
 

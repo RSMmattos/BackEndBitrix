@@ -53,6 +53,28 @@ class Batividadeg {
     }
   }
 
+  static async getByIdGrupo(idgrupobitrix) {
+    try {
+      const pool = await getConnection();
+      const result = await pool.request()
+        .input('idgrupobitrix', sql.Int, idgrupobitrix)
+        .query(`
+          SELECT
+            idtask,
+            comentario,
+            prioridade,
+            dataprazofinal,
+            dataconclusao
+          FROM batividadeg
+          WHERE idgrupobitrix = @idgrupobitrix
+          ORDER BY dataprazofinal ASC
+        `);
+      return result.recordset;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async create(data) {
     try {
       const pool = await getConnection();

@@ -50,6 +50,25 @@ class BatividadegController {
     }
   }
 
+  static async getByIdGrupo(req, res) {
+    try {
+      const { idgrupobitrix } = req.params;
+      const batividadegs = await Batividadeg.getByIdGrupo(idgrupobitrix);
+      
+      if (batividadegs.length === 0) {
+        return res.status(404).json({ message: 'Nenhuma atividade encontrada para este grupo' });
+      }
+      
+      res.json({
+        total: batividadegs.length,
+        idgrupobitrix,
+        registros: batividadegs
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
+
   static async create(req, res) {
     try {
       const data = req.body;
