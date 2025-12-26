@@ -4,6 +4,7 @@ const RelatorioController = require('../controllers/relatorioController');
 
 // Rotas específicas ANTES de rotas com parâmetros
 router.get('/resumo-atividades-pivot', RelatorioController.getResumoAtividadesPivot);
+router.get('/resumo-atividades-pivot-conclusao', RelatorioController.getResumoAtividadesPivotConclusao);
 router.get('/resumo-atividades', RelatorioController.getResumoAtividadesPorGrupo);
 
 // Rotas com parâmetro :codccusto

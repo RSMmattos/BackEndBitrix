@@ -42,11 +42,32 @@ class RelatorioController {
       
       res.json({
         periodo: 'Maio a Abril (dinâmico)',
+        tipo: 'Pivot com Data Prazo Final',
         total_registros: resultado.length,
         registros: resultado
       });
     } catch (error) {
       console.error('Erro ao gerar relatório PIVOT:', error);
+      res.status(500).json({ error: error.message });
+    }
+  }
+
+  static async getResumoAtividadesPivotConclusao(req, res) {
+    try {
+      const resultado = await Relatorio.getResumoAtividadesPivotConclusao();
+      
+      if (resultado.length === 0) {
+        return res.status(404).json({ message: 'Nenhum resultado encontrado' });
+      }
+      
+      res.json({
+        periodo: 'Maio a Abril (dinâmico)',
+        tipo: 'Pivot com Data Conclusão',
+        total_registros: resultado.length,
+        registros: resultado
+      });
+    } catch (error) {
+      console.error('Erro ao gerar relatório PIVOT Conclusão:', error);
       res.status(500).json({ error: error.message });
     }
   }
