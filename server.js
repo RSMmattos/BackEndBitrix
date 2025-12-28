@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { BASE_URL } = require('./config');
 const helmet = require('helmet');
 require('dotenv').config();
 
@@ -10,10 +11,11 @@ const usuarioRoutes = require('./routes/usuario');
 const relatorioRoutes = require('./routes/relatorio');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 // Middleware
 app.use(helmet());
+// CORS aberto para qualquer origem
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
