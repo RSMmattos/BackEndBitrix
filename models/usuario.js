@@ -86,9 +86,38 @@ class Gusuario {
         .query('SELECT * FROM gusuario WHERE codusuario = @codusuario AND ativo = 1');
       const user = result.recordset[0];
       if (user && await bcrypt.compare(senha, user.senha)) {
-        return { idusuario: user.idusuario, codperfil: user.codperfil, nome_usuario: user.nome_usuario };
+        return { idusuario: user.idusuario, codusuario: user.codusuario, codperfil: user.codperfil, nome_usuario: user.nome_usuario };
       }
       return null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  static async changePassword(idusuario, senhaAtual, senhaNova) {
+    try {
+      const pool = await getConnection();
+      const result = await pool.request()
+        .input('idusuario', sql.Int, idusuario)
+        .query('SELECT senha FROM gusuario WHERE idusuario = @idusuario');
+      
+      const user = result.recordset[0];
+      if (!user) {
+        return { success: false, message: 'Usuário não encontrado' };
+      }
+
+      const passwordMatch = await bcrypt.compare(senhaAtual, user.senha);
+      if (!passwordMatch) {
+        return { success: false, message: 'Senha atual está incorreta' };
+      }
+
+      const hashedPassword = await bcrypt.hash(senhaNova, 10);
+      await pool.request()
+        .input('idusuario', sql.Int, idusuario)
+        .input('senha', sql.VarChar(100), hashedPassword)
+        .query('UPDATE gusuario SET senha = @senha WHERE idusuario = @idusuario');
+
+      return { success: true, message: 'Senha alterada com sucesso' };
     } catch (error) {
       throw error;
     }
