@@ -1,78 +1,78 @@
 Links Completos da API BackBitrix
 
-Base URL: http://localhost:3000
+Base URL: http://localhost:3001
 
 Endpoints:
 
 1. Health Check
-   - GET http://localhost:3000/
+  - GET http://localhost:3001/
 
 2. Gccusto (Centros de Custo)
-   - GET http://localhost:3000/api/gccusto
-   - GET http://localhost:3000/api/gccusto/:codccusto
-   - POST http://localhost:3000/api/gccusto
-   - PUT http://localhost:3000/api/gccusto/:codccusto
-   - DELETE http://localhost:3000/api/gccusto/:codccusto
+  - GET http://localhost:3001/api/gccusto
+  - GET http://localhost:3001/api/gccusto/:codccusto
+  - POST http://localhost:3001/api/gccusto
+  - PUT http://localhost:3001/api/gccusto/:codccusto
+  - DELETE http://localhost:3001/api/gccusto/:codccusto
 
 3. Bgcatividade (Grupos de Atividade)
-   - GET http://localhost:3000/api/bgcatividade
-   - GET http://localhost:3000/api/bgcatividade/:codccusto
-   - POST http://localhost:3000/api/bgcatividade
-   - PUT http://localhost:3000/api/bgcatividade/:codccusto
-   - DELETE http://localhost:3000/api/bgcatividade/:codccusto
+  - GET http://localhost:3001/api/bgcatividade
+  - GET http://localhost:3001/api/bgcatividade/:codccusto
+  - POST http://localhost:3001/api/bgcatividade
+  - PUT http://localhost:3001/api/bgcatividade/:codccusto
+  - DELETE http://localhost:3001/api/bgcatividade/:codccusto
 
 4. Batividadeg (Atividades)
-   - GET http://localhost:3000/api/batividadeg
-   - GET http://localhost:3000/api/batividadeg/filtro/datas?dataInicio=YYYY-MM-DD&dataFim=YYYY-MM-DD
-   - GET http://localhost:3000/api/batividadeg/grupo/:idgrupobitrix
-   - GET http://localhost:3000/api/batividadeg/:idtask
-   - POST http://localhost:3000/api/batividadeg
-   - PUT http://localhost:3000/api/batividadeg/:idtask
-   - DELETE http://localhost:3000/api/batividadeg/:idtask
+  - GET http://localhost:3001/api/batividadeg
+  - GET http://localhost:3001/api/batividadeg/filtro/datas?dataInicio=YYYY-MM-DD&dataFim=YYYY-MM-DD
+  - GET http://localhost:3001/api/batividadeg/grupo/:idgrupobitrix
+  - GET http://localhost:3001/api/batividadeg/:idtask
+  - POST http://localhost:3001/api/batividadeg
+  - PUT http://localhost:3001/api/batividadeg/:idtask
+  - DELETE http://localhost:3001/api/batividadeg/:idtask
 
 5. Usuario (Usuários)
-   - GET http://localhost:3000/api/usuario
-   - GET http://localhost:3000/api/usuario/:idusuario
-   - POST http://localhost:3000/api/usuario
-   - PUT http://localhost:3000/api/usuario/:idusuario
-   - DELETE http://localhost:3000/api/usuario/:idusuario
-   - POST http://localhost:3000/api/usuario/login
-   - POST http://localhost:3000/api/usuario/alterar-senha/:idusuario
+  - GET http://localhost:3001/api/usuario
+  - GET http://localhost:3001/api/usuario/:idusuario
+  - POST http://localhost:3001/api/usuario
+  - PUT http://localhost:3001/api/usuario/:idusuario
+  - DELETE http://localhost:3001/api/usuario/:idusuario
+  - POST http://localhost:3001/api/usuario/login
+  - POST http://localhost:3001/api/usuario/alterar-senha/:idusuario
 
 6. Relatorio (Relatórios)
-   - GET http://localhost:3000/api/relatorio/resumo-atividades
-   - GET http://localhost:3000/api/relatorio/resumo-atividades-pivot
-   - GET http://localhost:3000/api/relatorio/resumo-atividades-pivot-conclusao
-   - GET http://localhost:3000/api/relatorio/resumo-atividades/:codccusto
+  - GET http://localhost:3001/api/relatorio/resumo-atividades
+  - GET http://localhost:3001/api/relatorio/resumo-atividades-pivot
+  - GET http://localhost:3001/api/relatorio/resumo-atividades-pivot-conclusao
+  - GET http://localhost:3001/api/relatorio/resumo-atividades/:codccusto
 
 Exemplo de uso com curl:
 
 Login:
-curl -X POST http://localhost:3000/api/usuario/login \
+curl -X POST http://localhost:3001/api/usuario/login \
   -H "Content-Type: application/json" \
   -d '{"codusuario":"admin","senha":"password"}'
 
 Alterar Senha (Trocar Senha do Usuário Logado):
-curl -X POST http://localhost:3000/api/usuario/alterar-senha/1 \
+curl -X POST http://localhost:3001/api/usuario/alterar-senha/1 \
   -H "Content-Type: application/json" \
   -d '{"senhaAtual":"password","senhaNova":"novaPassword123"}'
 
 Criar centro de custo:
-curl -X POST http://localhost:3000/api/gccusto \
+curl -X POST http://localhost:3001/api/gccusto \
   -H "Content-Type: application/json" \
   -d '{"codccusto":"001","nome":"Centro 1","ativo":true}'
 
 Obter Atividades por Grupo (idgrupobitrix):
-curl -X GET http://localhost:3000/api/batividadeg/grupo/1
+curl -X GET http://localhost:3001/api/batividadeg/grupo/1
 
 Obter Atividades por Filtro de Data:
-curl -X GET "http://localhost:3000/api/batividadeg/filtro/datas?dataInicio=2025-01-01&dataFim=2025-12-31"
+curl -X GET "http://localhost:3001/api/batividadeg/filtro/datas?dataInicio=2025-01-01&dataFim=2025-12-31"
 
 Obter Resumo de Atividades com Pivot (Data Prazo Final - Meses como colunas):
-curl -X GET http://localhost:3000/api/relatorio/resumo-atividades-pivot
+curl -X GET http://localhost:3001/api/relatorio/resumo-atividades-pivot
 
 Obter Resumo de Atividades com Pivot (Data Conclusão - Meses como colunas):
-curl -X GET http://localhost:3000/api/relatorio/resumo-atividades-pivot-conclusao
+curl -X GET http://localhost:3001/api/relatorio/resumo-atividades-pivot-conclusao
 
 ═══════════════════════════════════════════════════════════════════════════════
 
