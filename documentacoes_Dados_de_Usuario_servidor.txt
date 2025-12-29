@@ -1,0 +1,28 @@
+usuario: ssh rmatos@10.0.0.6
+senha: Agro123@
+
+============================================
+Documentação Oficial
+
+/var/www/BakEndBitrix
+
+
+cd /var/www/BakEndBitrix
+git status
+git pull origin main
+
+
+cria contêiner
+cd /var/www/BakEndBitrix
+docker compose build   # cria image
+docker compose up -d   # cria e sobe o contêiner
+
+
+Sempre que atualizar o código DO GIT:
+
+cd /var/www/BakEndBitrix
+rm -rf node_modules
+git pull
+docker compose build --no-cache
+docker compose up -d
+docker logs backendbitrix
