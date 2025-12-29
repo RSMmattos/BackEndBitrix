@@ -1,21 +1,26 @@
-# Dockerfile para Node.js API
-# Use a imagem oficial do Node.js
+# Dockerfile para Node.js API em produção (Ubuntu/Docker)
 FROM node:22
 
-# Crie diretório de trabalho
+# Ajuste timezone para America/Sao_Paulo (ou UTC se preferir)
+ENV TZ=America/Sao_Paulo
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Diretório de trabalho
 WORKDIR /app
 
-# Copie os arquivos do projeto
-COPY . .
-
-# Instale as dependências
+# Copie apenas package.json e package-lock.json para instalar dependências primeiro (cache)
+COPY package*.json ./
 RUN npm install --production
 
-# Exponha a porta (ajuste conforme necessário)
+# Copie o restante do código
+COPY . .
+
+# Exponha a porta da API
 EXPOSE 3001
 
-# Defina variável de ambiente para produção
+# Permita sobrescrever variáveis de ambiente no docker run
 ENV API_ENV=producao
+ENV PORT=3001
 
 # Comando para iniciar a API
 CMD ["npm", "start"]
