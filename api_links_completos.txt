@@ -1,3 +1,7 @@
+
+  - GET http://localhost:3001/api/batividadeg/modal_saldo_acumulado/:idgrupobitrix?mes_ref=YYYY-MM //modal saldo acumulado de atividades pendentes no mês
+# Obter Saldo Acumulado de Atividades Pendentes do Grupo e Mês
+curl -X GET "http://localhost:3001/api/batividadeg/modal_saldo_acumulado/1?mes_ref=2025-06"
 Links Completos da API BackBitrix
 
 Base URL: http://localhost:3001
@@ -23,8 +27,17 @@ Endpoints:
 
 4. Batividadeg (Atividades)
   - GET http://localhost:3001/api/batividadeg
+  - GET http://localhost:3001/api/batividadeg/porcentagem-relatorio?ano=2025 //Porcentagem Execução
+  - GET http://localhost:3001/api/batividadeg/saldo-acumulado-relatorio?ano=2025 //Atividades acumuladas
+  - GET http://localhost:3001/api/batividadeg/data-conclussao-relatorio-v2?ano=2025 //Atividades executadas
+  - GET http://localhost:3001/api/batividadeg/data-prazo-final-relatorio?ano=2025 //Atividas programadas
   - GET http://localhost:3001/api/batividadeg/filtro/datas?dataInicio=YYYY-MM-DD&dataFim=YYYY-MM-DD
-  - GET http://localhost:3001/api/batividadeg/grupo/:idgrupobitrix
+  - GET http://localhost:3001/api/batividadeg/grupo/:idgrupobitrix //modal atividades programadas
+  - GET http://localhost:3001/api/batividadeg/modal_concluidas/:idgrupobitrix //modal atividades concluidas
+  - GET http://localhost:3001/api/batividadeg/modal_nao_concluidas/:idgrupobitrix //modal atividades não concluidas
+  - GET http://localhost:3001/api/batividadeg/modal_saldo_acumulado/:idgrupobitrix //modal saldo acumulado de atividades pendentes
+  # Obter Saldo Acumulado de Atividades Pendentes do Grupo
+  curl -X GET http://localhost:3001/api/batividadeg/modal_saldo_acumulado/1
   - GET http://localhost:3001/api/batividadeg/:idtask
   - POST http://localhost:3001/api/batividadeg
   - PUT http://localhost:3001/api/batividadeg/:idtask
@@ -62,8 +75,24 @@ curl -X POST http://localhost:3001/api/gccusto \
   -H "Content-Type: application/json" \
   -d '{"codccusto":"001","nome":"Centro 1","ativo":true}'
 
-Obter Atividades por Grupo (idgrupobitrix):
-curl -X GET http://localhost:3001/api/batividadeg/grupo/1
+
+
+# Obter Atividades Concluídas do Grupo
+curl -X GET http://localhost:3001/api/batividadeg/modal_concluidas/1
+
+# Obter Atividades NÃO Concluídas do Grupo
+curl -X GET http://localhost:3001/api/batividadeg/modal_nao_concluidas/1
+
+
+# Obter Porcentagem Relatório (pivot por mês, ano base)
+curl -X GET "http://localhost:3001/api/batividadeg/porcentagem-relatorio?ano=2025"
+
+
+# Obter Relatório de Data de Conclusão V2 (pivot por mês de conclusão, maio a abril, ano base)
+curl -X GET "http://localhost:3001/api/batividadeg/data-conclussao-relatorio-v2?ano=2025"
+
+# Obter Relatório de Data de Prazo Final (pivot por mês de prazo final, maio a abril, ano base)
+curl -X GET "http://localhost:3001/api/batividadeg/data-prazo-final-relatorio?ano=2025"
 
 Obter Atividades por Filtro de Data:
 curl -X GET "http://localhost:3001/api/batividadeg/filtro/datas?dataInicio=2025-01-01&dataFim=2025-12-31"

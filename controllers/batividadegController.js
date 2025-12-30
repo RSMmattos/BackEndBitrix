@@ -1,6 +1,106 @@
-const Batividadeg = require('../models/batividadeg');
+  const Batividadeg = require('../models/batividadeg');
 
-class BatividadegController {
+  class BatividadegController {
+                static async modalSaldoAcumulado(req, res) {
+                  try {
+                    const { idgrupobitrix } = req.params;
+                    const { mes_ref } = req.query; // formato 'YYYY-MM'
+                    if (!mes_ref) {
+                      return res.status(400).json({ error: 'Parâmetro mes_ref (YYYY-MM) é obrigatório. Exemplo: /modal_saldo_acumulado/1?mes_ref=2025-06' });
+                    }
+                    const atividades = await Batividadeg.getAtividadesAcumuladasPorGrupoMes(idgrupobitrix, mes_ref);
+                    res.json({
+                      idgrupobitrix,
+                      mes_ref,
+                      total: atividades.length,
+                      atividades
+                    });
+                  } catch (error) {
+                    res.status(500).json({ error: error.message });
+                  }
+                }
+        static async modalConcluidas(req, res) {
+          try {
+            const { idgrupobitrix } = req.params;
+            const batividadegs = await Batividadeg.getByIdGrupo(idgrupobitrix);
+            // Filtrar apenas as atividades concluídas
+            const concluidas = batividadegs.filter(a => a.dataconclusao);
+            res.json({
+              total: concluidas.length,
+              idgrupobitrix,
+              registros: concluidas.map(a => ({
+                idtask: a.idtask,
+                comentario: a.comentario,
+                prioridade: a.prioridade,
+                dataprazofinal: a.dataprazofinal,
+                dataconclusao: a.dataconclusao
+              }))
+            });
+          } catch (error) {
+            res.status(500).json({ error: error.message });
+          }
+        }
+        static async modalNaoConcluidas(req, res) {
+          try {
+            const { idgrupobitrix } = req.params;
+            const registros = await Batividadeg.getNaoConcluidasPorGrupo(idgrupobitrix);
+            res.json({
+              total: registros.length,
+              idgrupobitrix,
+              registros
+            });
+          } catch (error) {
+            res.status(500).json({ error: error.message });
+          }
+        }
+      static async dataPrazoFinalRelatorio(req, res) {
+        try {
+          const ano = parseInt(req.query.ano, 10);
+          if (!ano || isNaN(ano)) {
+            return res.status(400).json({ error: 'Parâmetro "ano" é obrigatório e deve ser um número. Exemplo: /api/batividadeg/data-prazo-final-relatorio?ano=2025' });
+          }
+          const resultado = await Batividadeg.getDataPrazoFinalRelatorio(ano);
+          res.json(resultado);
+        } catch (error) {
+          res.status(500).json({ error: error.message });
+        }
+      }
+    static async dataConclussaoRelatorioV2(req, res) {
+      try {
+        const ano = parseInt(req.query.ano, 10);
+        if (!ano || isNaN(ano)) {
+          return res.status(400).json({ error: 'Parâmetro "ano" é obrigatório e deve ser um número. Exemplo: /api/batividadeg/data-conclussao-relatorio-v2?ano=2025' });
+        }
+        const resultado = await Batividadeg.getDataConclussaoRelatorioV2(ano);
+        res.json(resultado);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    }
+    static async saldoAcumuladoRelatorio(req, res) {
+      try {
+        const ano = parseInt(req.query.ano, 10);
+        if (!ano || isNaN(ano)) {
+          return res.status(400).json({ error: 'Parâmetro "ano" é obrigatório e deve ser um número. Exemplo: /api/batividadeg/saldo-acumulado-relatorio?ano=2025' });
+        }
+        const resultado = await Batividadeg.getSaldoAcumuladoRelatorio(ano);
+        res.json(resultado);
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    }
+  static async porcentagemRelatorio(req, res) {
+    try {
+      const ano = parseInt(req.query.ano, 10);
+      if (!ano || isNaN(ano)) {
+        return res.status(400).json({ error: 'Parâmetro "ano" é obrigatório e deve ser um número. Exemplo: /api/batividadeg/porcentagem-relatorio?ano=2025' });
+      }
+      const resultado = await Batividadeg.getPorcentagemRelatorio(ano);
+      res.json(resultado);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  }
   static async getAll(req, res) {
     try {
       const batividadegs = await Batividadeg.getAll();
