@@ -188,55 +188,54 @@ EXEC sp_executesql
       try {
         const pool = await getConnection();
         const query = `
-DECLARE @AnoBase INT = @anoBase;
-DECLARE @dataInicio DATE = DATEFROMPARTS(@AnoBase, 5, 1);
-DECLARE @dataFim DATE = DATEFROMPARTS(@AnoBase + 1, 5, 1);
-DECLARE @cols NVARCHAR(MAX);
-DECLARE @sql NVARCHAR(MAX);
+    DECLARE @dataInicio DATE = DATEFROMPARTS(@anoBase, 5, 1);
+    DECLARE @dataFim DATE = DATEFROMPARTS(@anoBase + 1, 5, 1);
+    DECLARE @cols NVARCHAR(MAX);
+    DECLARE @sql NVARCHAR(MAX);
 
-SELECT @cols = STUFF((
-    SELECT ',' + QUOTENAME(CONVERT(VARCHAR(7), DATEADD(MONTH, v.number, @dataInicio), 120))
-    FROM master..spt_values v
-    WHERE v.type = 'P'
-      AND v.number BETWEEN 0 AND 11
-    ORDER BY v.number
-    FOR XML PATH(''), TYPE
-).value('.', 'NVARCHAR(MAX)'), 1, 1, '');
+    SELECT @cols = STUFF((
+      SELECT ',' + QUOTENAME(CONVERT(VARCHAR(7), DATEADD(MONTH, v.number, @dataInicio), 120))
+      FROM master..spt_values v
+      WHERE v.type = 'P'
+        AND v.number BETWEEN 0 AND 11
+      ORDER BY v.number
+      FOR XML PATH(''), TYPE
+    ).value('.', 'NVARCHAR(MAX)'), 1, 1, '');
 
-SET @sql = '
-SELECT
-    pvt.codccusto_nome,
-    pvt.idgrupobitrix,
-    pvt.total_registros,
-    ' + @cols + '
-FROM (
+    SET @sql = '
     SELECT
+      pvt.codccusto_nome,
+      pvt.idgrupobitrix,
+      pvt.total_registros,
+      ' + @cols + '
+    FROM (
+      SELECT
         c.codccusto + '' - '' + c.nome AS codccusto_nome,
         a.idgrupobitrix,
         COUNT(b.id) OVER (PARTITION BY a.idgrupobitrix) AS total_registros,
         CONVERT(VARCHAR(7), b.dataconclusao, 120) AS mes_ref,
         b.id
-    FROM gccusto c
-    INNER JOIN bgcatividade a
+      FROM gccusto c
+      INNER JOIN bgcatividade a
         ON a.codccusto = c.codccusto
-    LEFT JOIN batividadeg b
+      LEFT JOIN batividadeg b
         ON b.idgrupobitrix = a.idgrupobitrix
-       AND b.dataconclusao >= @dataInicio
-       AND b.dataconclusao <  @dataFim
-    WHERE c.ativo = 1
-      AND b.dataconclusao IS NOT NULL
-) src
-PIVOT (
-    COUNT(id) FOR mes_ref IN (' + @cols + ')
-) pvt
-ORDER BY pvt.codccusto_nome;';
+         AND b.dataconclusao >= @dataInicio
+         AND b.dataconclusao <  @dataFim
+      WHERE c.ativo = 1
+        AND b.dataconclusao IS NOT NULL
+    ) src
+    PIVOT (
+      COUNT(id) FOR mes_ref IN (' + @cols + ')
+    ) pvt
+    ORDER BY pvt.codccusto_nome;';
 
-EXEC sp_executesql
-    @sql,
-    N'@dataInicio DATE, @dataFim DATE',
-    @dataInicio,
-    @dataFim;
-`;
+    EXEC sp_executesql
+      @sql,
+      N'@dataInicio DATE, @dataFim DATE',
+      @dataInicio,
+      @dataFim;
+    `;
         const result = await pool.request()
           .input('anoBase', sql.Int, anoBase)
           .query(query);
